@@ -1,3 +1,10 @@
+# Compny 1.0.1
+
+- Give Compny its own activity bar icon, commands, and settings.
+- Migrate settings and configuration saved by earlier Compny versions.
+
+---
+
 # Compny 1.0.0
 
 - OpenAI Responses API code completion with a dedicated configuration sidebar.

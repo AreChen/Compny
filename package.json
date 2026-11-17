@@ -2,7 +2,7 @@
   "name": "compny",
   "displayName": "Compny",
   "description": "AI code completion powered by OpenAI.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icon": "assets/icon.png",
   "keywords": [
     "code-completion",
@@ -16,7 +16,7 @@
     "url": "https://github.com/AreChen/Compny"
   },
   "license": "MIT",
-  "publisher": "eapil",
+  "publisher": "rust-analyzer-lingo",
   "engines": {
     "vscode": "^1.93.0"
   },
