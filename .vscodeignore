@@ -39,3 +39,12 @@ out/test/**
 !node_modules/bare-semver/**
 !node_modules/bare-events/**
 !node_modules/events-universal/**
+
+# Build output for the completion extension only.
+out/**
+!out/index.js
+!out/tree-sitter.wasm
+!out/tree-sitter-wasms/**
+models/**
+README.pt-BR.md
+README.zh-CN.md

@@ -9,6 +9,9 @@ import {
 import { resolveProviderEndpoint } from "./endpoint"
 import { TwinnyProvider } from "./manager"
 
+let openAIKey = ""
+export const setOpenAIKey = (key: string) => { openAIKey = key }
+
 export class Base {
   public config = vscode.workspace.getConfiguration("twinny")
   public context?: vscode.ExtensionContext
@@ -34,7 +37,8 @@ export class Base {
     const provider = this.context?.globalState.get<TwinnyProvider>(
       ACTIVE_FIM_PROVIDER_STORAGE_KEY
     )
-    return resolveProviderEndpoint(provider)
+    if (provider?.provider !== "openai" || !openAIKey) return undefined
+    return resolveProviderEndpoint({ ...provider, apiKey: openAIKey })
   }
 
   /**

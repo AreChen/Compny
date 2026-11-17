@@ -92,7 +92,7 @@ export class Logger {
 
   private constructor() {
     this.channel = vscode
-      ? vscode.window.createOutputChannel("Twinny", { log: true })
+      ? vscode.window.createOutputChannel("Compny", { log: true })
       : headlessSink()
   }
 

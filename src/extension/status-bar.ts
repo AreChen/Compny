@@ -23,7 +23,7 @@ export class TwinnyStatusBar {
     private readonly _context: ExtensionContext,
     private readonly _generations: GenerationTracker
   ) {
-    this._item.name = "Twinny"
+    this._item.name = "Compny"
     this._subscription = _generations.onDidChange((state) => {
       if (state.busy) this.showBusy()
       else this.refresh()
@@ -32,7 +32,7 @@ export class TwinnyStatusBar {
 
   private showBusy() {
     this._item.text = ICON_BUSY
-    this._item.tooltip = "Twinny is generating — click to stop"
+    this._item.tooltip = "Compny is generating — click to stop"
     this._item.command = TWINNY_COMMAND_NAME.stopGeneration
     this._item.show()
   }
@@ -53,9 +53,9 @@ export class TwinnyStatusBar {
     )
 
     const lines = [
-      provider
-        ? `Twinny · ${provider.modelName} (${provider.label})`
-        : "Twinny · no FIM provider selected",
+      provider?.provider === "openai"
+        ? `Compny · ${provider.modelName} (${provider.label})`
+        : "Compny · no FIM provider selected",
       autoSuggest
         ? "Auto-suggest is on"
         : "Auto-suggest is off — trigger completions manually with Alt+\\",

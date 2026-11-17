@@ -23,6 +23,7 @@ import {
 import { fluencyChat, hostedModels } from "./fluency"
 import { HttpInferenceProvider } from "./http"
 import { needsResponsesApi, responsesChat } from "./openai-responses"
+import { responsesFim } from "./responses-fim"
 
 export class HostedInferenceProvider implements InferenceProvider {
   public readonly id: string
@@ -52,6 +53,9 @@ export class HostedInferenceProvider implements InferenceProvider {
   }
 
   public fim(...args: Parameters<HttpInferenceProvider["fim"]>) {
+    if (this._config.provider === API_PROVIDERS.OpenAI) {
+      return responsesFim(this._config, ...args)
+    }
     return this._endpoint.fim(...args)
   }
 

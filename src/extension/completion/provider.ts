@@ -1,5 +1,6 @@
 import {
   CancellationToken,
+  commands,
   Disposable,
   EndOfLine,
   ExtensionContext,
@@ -11,6 +12,7 @@ import {
   Range,
   SelectedCompletionInfo,
   TextDocument,
+  TextEditorSelectionChangeEvent,
   Uri,
   window,
   workspace
@@ -38,6 +40,7 @@ import {
   isCancelled,
   resolveInferenceProvider
 } from "../inference"
+import { toInferenceError } from "../inference/errors"
 import { Base } from "../providers/base"
 import { describeProviderErrorPlain } from "../providers/errors"
 import { TwinnyProvider } from "../providers/manager"
@@ -134,11 +137,33 @@ const IGNORED_SCHEMES = new Set([
   "comment"
 ])
 
+let lastFailureNotice = 0
+
+/** Avoid a popup on every keystroke while making request failures visible. */
+function notifyCompletionFailure(error: unknown) {
+  const now = Date.now()
+  if (now - lastFailureNotice < 30_000) return
+  lastFailureNotice = now
+  const failure = toInferenceError(error)
+  const message = failure.kind === "authentication"
+    ? "Compny 补全请求认证失败。请检查 API 地址和对应的 API Key。"
+    : failure.kind === "model-unavailable"
+      ? "Twinny 找不到所配置的模型。请检查模型名称和接口权限。"
+      : failure.kind === "rate-limited"
+        ? "Compny 补全请求受到限流或额度限制，请检查接口额度。"
+        : `Compny 补全请求失败${failure.status ? `（HTTP ${failure.status}）` : ""}。请查看日志。`
+  void window.showErrorMessage(message, "打开配置", "查看日志").then(choice => {
+    if (choice === "打开配置") void commands.executeCommand("twinny.configureOpenAI")
+    else if (choice === "查看日志") logger.show()
+  })
+}
+
 export class CompletionProvider
   extends Base
   implements InlineCompletionItemProvider
 {
   private _run: GenerationRun | null = null
+  private _pendingSelection?: { document: TextDocument; position: Position }
   private _acceptedLastCompletion = false
   private _definitions = new DefinitionContext()
   private _fileInteractionCache: FileInteractionCache
@@ -313,6 +338,7 @@ export class CompletionProvider
       provider,
       token
     }
+    this._pendingSelection = { document, position }
 
     if (!isManualTrigger) {
       await this.debounce(this.config.get<number>("debounceWait", 300))
@@ -394,7 +420,7 @@ export class CompletionProvider
       textBeforeCursor: request.lineBefore,
       textAfterCursor: request.lineAfter,
       suffixFirstLine: this.getFirstNonBlankLine(prefixSuffix.suffix),
-      unwrapFences: isChatFimFormat(provider.modelName, provider.fimTemplate),
+      unwrapFences: provider.provider === "openai" || isChatFimFormat(provider.modelName, provider.fimTemplate),
       wordFragment: request.wordFragment
     })
 
@@ -444,12 +470,13 @@ export class CompletionProvider
       streamEnded = !stoppedEarly
       completion = stream.finish()
     } catch (error) {
-      if (isCancelled(error)) {
+      if (isCancelled(error) || run.signal.aborted || this.isStale(request)) {
         completion = stoppedBy === "timeout" ? stream.finish() : ""
       } else {
         logger.error(
           `FIM #${request.id} failed: ${describeProviderErrorPlain(error, provider)}`
         )
+        notifyCompletionFailure(error)
         if (error instanceof Error) notifyKnownErrors(error)
       }
     } finally {
@@ -909,12 +936,26 @@ export class CompletionProvider
   /** The editor moved on (cursor moved, stop pressed): drop whatever is in flight. */
   public abortCompletion() {
     this._requestId++
+    this._pendingSelection = undefined
     if (this._run) {
       logger.debug(`FIM #${this._requestId - 1} aborted: the cursor moved or generation was stopped`)
       this._run.abort()
     }
     this._run = null
     this.checkPrefetch()
+  }
+
+  /** Selection notifications can arrive after the matching completion request. */
+  public selectionChanged(event: TextEditorSelectionChangeEvent) {
+    const pending = this._pendingSelection
+    if (!pending) {
+      this.checkPrefetch()
+      return
+    }
+    if (event.textEditor.document !== pending.document) return
+    if (event.selections.length === 1 && event.selections[0].isEmpty &&
+        event.selections[0].active.isEqual(pending.position)) return
+    this.abortCompletion()
   }
 
   /**

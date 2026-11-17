@@ -10,6 +10,37 @@ import { GenerationTracker } from "../../extension/generations"
 import { TemplateProvider } from "../../extension/templates/provider"
 
 suite("Completion lifecycle", () => {
+  for (const moved of [false, true]) {
+    test(`selection ${moved ? "at a different position cancels" : "at the requested position keeps"} automatic completion`, async () => {
+      const context = { globalState: { get: () => undefined } } as unknown as vscode.ExtensionContext
+      const provider = new CompletionProvider(new GenerationTracker(), new FileInteractionCache(), {} as TemplateProvider, context)
+      let requests = 0
+      Object.assign(provider, {
+        getFimProvider: () => ({ id: "test", modelName: "test" }),
+        config: { get(key: string, fallback: unknown) {
+          if (key === "enabled" || key === "autoSuggestEnabled") return true
+          if (key === "debounceWait") return 30
+          return fallback
+        } },
+        async complete() { requests++; return undefined }
+      })
+      const document = await vscode.workspace.openTextDocument({ content: "const value = " })
+      const position = new vscode.Position(0, 14)
+      const source = new vscode.CancellationTokenSource()
+      try {
+        const pending = provider.provideInlineCompletionItems(document, position,
+          { triggerKind: vscode.InlineCompletionTriggerKind.Automatic, selectedCompletionInfo: undefined }, source.token)
+        const selection = new vscode.Selection(moved ? new vscode.Position(0, 0) : position, moved ? new vscode.Position(0, 0) : position)
+        provider.selectionChanged({ textEditor: { document } as vscode.TextEditor, selections: [selection], kind: undefined })
+        await pending
+        assert.strictEqual(requests, moved ? 0 : 1)
+      } finally {
+        source.dispose()
+        provider.dispose()
+      }
+    })
+  }
+
   for (const stop of ["explicit abort", "new disabled invocation"]) {
     test(`${stop} invalidates a request still waiting for debounce`, async () => {
       const context = { globalState: { get: () => ({ id: "test", modelName: "test" }) } } as unknown as vscode.ExtensionContext
@@ -22,6 +53,7 @@ suite("Completion lifecycle", () => {
       let enabled = true
       let requests = 0
       Object.assign(provider, {
+        getFimProvider: () => ({ id: "test", modelName: "test" }),
         config: {
           get(key: string, fallback: unknown) {
             if (key === "enabled") return enabled
@@ -63,6 +95,7 @@ suite("Completion lifecycle", () => {
     )
     let requests = 0
     Object.assign(provider, {
+      getFimProvider: () => ({ id: "test", modelName: "test" }),
       config: {
         get(key: string, fallback: unknown) {
           if (key === "enabled" || key === "autoSuggestEnabled") return true
@@ -128,6 +161,7 @@ suite("Completion lifecycle", () => {
       const completions = new CompletionProvider(
         new GenerationTracker(), new FileInteractionCache(), new TemplateProvider(undefined), context
       )
+      Object.assign(completions, { getFimProvider: () => config })
       const document = await vscode.workspace.openTextDocument({
         content: "const total = sum(items)\n\nexport {}\n", language: "javascript"
       })
