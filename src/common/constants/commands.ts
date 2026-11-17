@@ -2,7 +2,7 @@ export const TWINNY_COMMAND_NAME = {
   addTests: "twinny.addTests",
   addTypes: "twinny.addTypes",
   conversationHistory: "twinny.conversationHistory",
-  disable: "twinny.disable",
+  disable: "compny.disable",
   edit: "twinny.edit",
   acceptEdit: "twinny.acceptEdit",
   rejectEdit: "twinny.rejectEdit",
@@ -10,7 +10,7 @@ export const TWINNY_COMMAND_NAME = {
   chatFileEdit: "twinny.chatFileEdit",
   chatFileCreate: "twinny.chatFileCreate",
   embeddings: "twinny.embeddings",
-  enable: "twinny.enable",
+  enable: "compny.enable",
   review: "twinny.review",
   explain: "twinny.explain",
   focusSidebar: "twinny.sidebar.focus",
@@ -27,10 +27,10 @@ export const TWINNY_COMMAND_NAME = {
   openChat: "twinny.openChat",
   openTeamPlugins: "twinny.openTeamPlugins",
   refactor: "twinny.refactor",
-  settings: "twinny.settings",
+  settings: "compny.settings",
   setUpTeam: "twinny.setUpTeam",
-  statusBarMenu: "twinny.statusBarMenu",
-  stopGeneration: "twinny.stopGeneration",
+  statusBarMenu: "compny.statusBarMenu",
+  stopGeneration: "compny.stopGeneration",
   templateCompletion: "twinny.templateCompletion",
   templates: "twinny.templates",
   addFileToContext: "twinny.addFileToContext",
@@ -39,5 +39,5 @@ export const TWINNY_COMMAND_NAME = {
   shareOllama: "twinny.shareOllama",
   terminalCommand: "twinny.terminalCommand",
   fixTerminalError: "twinny.fixTerminalError",
-  showLogs: "twinny.showLogs"
+  showLogs: "compny.showLogs"
 }

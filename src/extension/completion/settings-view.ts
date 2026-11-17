@@ -5,7 +5,7 @@ import { TwinnyProvider } from "../../common/types"
 import { setOpenAIKey } from "../providers/base"
 import { getNonce } from "../utils"
 
-const SECRET_KEY = "twinny.openai.apiKey"
+const SECRET_KEY = "compny.openai.apiKey"
 const DEFAULT_URL = "https://api.openai.com/v1/responses"
 
 /** The completion-only settings view. The saved key is never sent to the webview. */
@@ -21,7 +21,7 @@ export class CompletionSettingsView implements WebviewViewProvider {
     view.webview.onDidReceiveMessage(async message => {
       if (message?.type === "ready") await this.refresh()
       if (message?.type === "save") await this.save(message)
-      if (message?.type === "settings") await workspace.getConfiguration("twinny").update("autoSuggestEnabled", !!message.autoSuggest, ConfigurationTarget.Global)
+      if (message?.type === "settings") await workspace.getConfiguration("compny").update("autoSuggestEnabled", !!message.autoSuggest, ConfigurationTarget.Global)
     }, undefined, this.context.subscriptions)
   }
 
@@ -33,7 +33,7 @@ export class CompletionSettingsView implements WebviewViewProvider {
       : DEFAULT_URL
     await this.view?.webview.postMessage({ type: "state", model: provider?.provider === API_PROVIDERS.OpenAI ? provider.modelName : "gpt-4.1-mini", endpoint,
       hasKey: !!(await this.context.secrets.get(SECRET_KEY)),
-      autoSuggest: workspace.getConfiguration("twinny").get<boolean>("autoSuggestEnabled", true) })
+      autoSuggest: workspace.getConfiguration("compny").get<boolean>("autoSuggestEnabled", true) })
   }
 
   private async save(message: { model?: unknown; endpoint?: unknown; key?: unknown }) {
@@ -69,7 +69,7 @@ export class CompletionSettingsView implements WebviewViewProvider {
     return `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
       <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
       <style nonce="${nonce}">body{font-family:var(--vscode-font-family);padding:12px;color:var(--vscode-foreground)}h2{font-size:1.2em;margin:4px 0 16px}label{display:block;margin:14px 0 6px}input[type=text],input[type=password]{box-sizing:border-box;width:100%;padding:7px;color:var(--vscode-input-foreground);background:var(--vscode-input-background);border:1px solid var(--vscode-input-border,transparent)}button{width:100%;margin-top:16px;padding:8px;border:0;cursor:pointer;color:var(--vscode-button-foreground);background:var(--vscode-button-background)}button:hover{background:var(--vscode-button-hoverBackground)}small{display:block;opacity:.8;margin-top:5px;line-height:1.4}.check{display:flex;gap:8px;align-items:center}</style></head>
-      <body><h2>OpenAI 代码补全</h2><form id="form"><label for="endpoint">Responses API 地址</label><input id="endpoint" type="text" required><small>填写完整 /responses 地址，或以 /v1 结尾的 API 地址。</small><label for="model">模型</label><input id="model" type="text" required><label for="key">API Key</label><input id="key" type="password" autocomplete="off"><small id="keyHint">密钥保存在 VS Code 安全存储中。</small><button type="submit">保存配置</button></form><label class="check"><input type="checkbox" id="auto">输入时自动补全</label><small>也可按 Alt+\u005c 手动触发补全。</small>
+      <body><h2>Compny 代码补全</h2><form id="form"><label for="endpoint">Responses API 地址</label><input id="endpoint" type="text" required><small>填写完整 /responses 地址，或以 /v1 结尾的 API 地址。</small><label for="model">模型</label><input id="model" type="text" required><label for="key">API Key</label><input id="key" type="password" autocomplete="off"><small id="keyHint">密钥保存在 VS Code 安全存储中。</small><button type="submit">保存配置</button></form><label class="check"><input type="checkbox" id="auto">输入时自动补全</label><small>也可按 Alt+\u005c 手动触发补全。</small>
       <script nonce="${nonce}">const vscode=acquireVsCodeApi();const endpoint=document.getElementById('endpoint'),model=document.getElementById('model'),key=document.getElementById('key'),auto=document.getElementById('auto');window.addEventListener('message',event=>{const s=event.data;if(s.type!=='state')return;endpoint.value=s.endpoint;model.value=s.model;key.value='';key.placeholder=s.hasKey?'已保存，留空则保持不变':'请输入 API Key';auto.checked=s.autoSuggest});document.getElementById('form').addEventListener('submit',event=>{event.preventDefault();vscode.postMessage({type:'save',endpoint:endpoint.value,model:model.value,key:key.value})});auto.addEventListener('change',()=>vscode.postMessage({type:'settings',autoSuggest:auto.checked}));vscode.postMessage({type:'ready'});</script></body></html>`
   }
 }

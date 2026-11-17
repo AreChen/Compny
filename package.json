@@ -1,6 +1,6 @@
 {
   "name": "compny",
-  "displayName": "Compny - AI Code Completion",
+  "displayName": "Compny",
   "description": "AI code completion powered by OpenAI.",
   "version": "1.0.0",
   "icon": "assets/icon.png",
@@ -16,7 +16,7 @@
     "url": "https://github.com/AreChen/Compny"
   },
   "license": "MIT",
-  "publisher": "rust-analyzer-lingo",
+  "publisher": "eapil",
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -39,42 +39,42 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "twinny.statusBarMenu",
+          "command": "compny.statusBarMenu",
           "when": "false"
         }
       ]
     },
     "commands": [
       {
-        "command": "twinny.enable",
+        "command": "compny.enable",
         "shortTitle": "Enable Compny",
         "title": "Enable Compny"
       },
       {
-        "command": "twinny.stopGeneration",
+        "command": "compny.stopGeneration",
         "title": "Stop generation"
       },
       {
-        "command": "twinny.disable",
+        "command": "compny.disable",
         "title": "Disable Compny",
         "shortTitle": "Disable Compny"
       },
       {
-        "command": "twinny.settings",
+        "command": "compny.settings",
         "shortTitle": "Compny settings",
         "title": "Open Compny settings",
         "icon": "$(gear)"
       },
       {
-        "command": "twinny.showLogs",
+        "command": "compny.showLogs",
         "title": "Compny - Show logs"
       },
       {
-        "command": "twinny.statusBarMenu",
+        "command": "compny.statusBarMenu",
         "title": "Compny - Status bar options"
       },
       {
-        "command": "twinny.configureOpenAI",
+        "command": "compny.configureOpenAI",
         "title": "Compny - Configure OpenAI"
       }
     ],
@@ -86,20 +86,20 @@
       },
       {
         "key": "CTRL+SHIFT+/",
-        "command": "twinny.stopGeneration",
-        "when": "twinnyGeneratingText"
+        "command": "compny.stopGeneration",
+        "when": "compnyGeneratingText"
       }
     ],
     "configuration": {
       "title": "Compny",
       "properties": {
-        "twinny.enabled": {
+        "compny.enabled": {
           "order": 0,
           "type": "boolean",
           "default": true,
           "markdownDescription": "Toggles the Compny extension on or off. When `true`, Compny is active and ready to provide completions."
         },
-        "twinny.enabledLanguages": {
+        "compny.enabledLanguages": {
           "order": 1,
           "type": "object",
           "additionalProperties": {
@@ -110,79 +110,79 @@
           },
           "markdownDescription": "Specifies which languages to enable completions with Compny for. Use `*` as the default for all languages. Example:\n```json\n{\n  \"*\": true,\n  \"python\": true,\n  \"javascript\": false\n}\n```"
         },
-        "twinny.autoSuggestEnabled": {
+        "compny.autoSuggestEnabled": {
           "order": 3,
           "type": "boolean",
           "default": true,
           "markdownDescription": "When `true`, Compny will automatically suggest completions. You can still manually trigger completions using the default shortcut (`Alt+\\`)."
         },
-        "twinny.contextLength": {
+        "compny.contextLength": {
           "order": 4,
           "type": "number",
           "default": 100,
           "markdownDescription": "Specifies how many lines of context (before and after the current line) to include in Fill-in-Middle (FIM) prompts. A higher number provides more context but may slow down completions.",
           "required": true
         },
-        "twinny.debounceWait": {
+        "compny.debounceWait": {
           "order": 5,
           "type": "number",
           "default": 300,
           "markdownDescription": "Sets the delay (in milliseconds) before triggering the next completion. This helps reduce API calls and improve performance.",
           "required": true
         },
-        "twinny.multilineCompletionsEnabled": {
+        "compny.multilineCompletionsEnabled": {
           "order": 7,
           "type": "boolean",
           "default": true,
           "markdownDescription": "When `true`, Compny will attempt to generate multi-line completions. This is an experimental feature and may not work perfectly in all scenarios."
         },
-        "twinny.maxLines": {
+        "compny.maxLines": {
           "dependencies": {
-            "twinny.multilineCompletionsEnabled": true
+            "compny.multilineCompletionsEnabled": true
           },
           "order": 8,
           "type": "number",
           "default": 40,
-          "markdownDescription": "Sets the maximum number of lines for multi-line completions. Only applies when `twinny.multilineCompletionsEnabled` is `true`."
+          "markdownDescription": "Sets the maximum number of lines for multi-line completions. Only applies when `compny.multilineCompletionsEnabled` is `true`."
         },
-        "twinny.fileContextEnabled": {
+        "compny.fileContextEnabled": {
           "order": 9,
           "type": "boolean",
           "default": false,
           "markdownDescription": "When `true`, Compny will scan neighboring documents to provide more context for completions. This is an experimental feature and may impact performance."
         },
-        "twinny.recentEditsEnabled": {
+        "compny.recentEditsEnabled": {
           "order": 9,
           "type": "boolean",
           "default": true,
           "markdownDescription": "Shows the model the last few changes you made, in any open file, as short diffs. A half-done rename or a pattern being applied across a file then carries into completions. Up to 6 changes and 2,500 characters."
         },
-        "twinny.lspContextEnabled": {
+        "compny.lspContextEnabled": {
           "order": 9,
           "type": "boolean",
           "default": true,
           "markdownDescription": "Includes matching IntelliSense symbols and available type signatures in FIM context. Uses installed completion providers, with up to 20 suggestions, 2,000 characters and a 150 ms wait limit. Works independently of file context."
         },
-        "twinny.completionCacheEnabled": {
+        "compny.completionCacheEnabled": {
           "order": 10,
           "type": "boolean",
           "default": false,
           "markdownDescription": "Enables caching of Fill-in-Middle (FIM) completions for identical prompts. This can significantly improve performance but may use more memory."
         },
-        "twinny.numPredictFim": {
+        "compny.numPredictFim": {
           "order": 12,
           "type": "number",
           "default": 512,
           "markdownDescription": "Defines the maximum number of tokens for Fill-in-Middle (FIM) completions. Use `-1` for no limit. Compny will attempt to stop at logical line breaks regardless of this setting.",
           "required": true
         },
-        "twinny.enableSubsequentCompletions": {
+        "compny.enableSubsequentCompletions": {
           "order": 13,
           "type": "boolean",
           "default": true,
           "markdownDescription": "When `true`, Compny will continue to make completion requests to the API after the previous completion was accepted. This can provide a more fluid completion experience."
         },
-        "twinny.secretShield": {
+        "compny.secretShield": {
           "order": 18,
           "type": "string",
           "enum": [
@@ -198,7 +198,7 @@
           "default": "offMachine",
           "markdownDescription": "**Secret shield.** API keys, tokens, private keys and passwords in a prompt (your question, attached files, the code around the cursor) are replaced with placeholders like `REDACTED_GITHUB_TOKEN_1` before the request is sent, and put back wherever the reply repeats a placeholder. The model never sees the value; the chat shows how many were withheld. Detection covers well-known token formats, private key blocks, passwords in URLs, and secret-named values in code and `.env` files."
         },
-        "twinny.enableLogging": {
+        "compny.enableLogging": {
           "order": 19,
           "type": "boolean",
           "default": true,
@@ -209,17 +209,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "twinny-sidebar-view",
+          "id": "compny-sidebar-view",
           "title": "Compny",
-          "icon": "assets/twinny.svg"
+          "icon": "assets/compny-activity.svg"
         }
       ]
     },
     "views": {
-      "twinny-sidebar-view": [
+      "compny-sidebar-view": [
         {
           "type": "webview",
-          "id": "twinny.sidebar",
+          "id": "compny.sidebar",
           "name": "代码补全"
         }
       ]

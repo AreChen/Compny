@@ -13,7 +13,7 @@ let openAIKey = ""
 export const setOpenAIKey = (key: string) => { openAIKey = key }
 
 export class Base {
-  public config = vscode.workspace.getConfiguration("twinny")
+  public config = vscode.workspace.getConfiguration("compny")
   public context?: vscode.ExtensionContext
   private _configListener: vscode.Disposable
 
@@ -22,7 +22,7 @@ export class Base {
 
     this._configListener = vscode.workspace.onDidChangeConfiguration(
       (event) => {
-        if (!event.affectsConfiguration("twinny")) return
+        if (!event.affectsConfiguration("compny")) return
         this.updateConfig()
       }
     )
@@ -60,6 +60,6 @@ export class Base {
   }
 
   public updateConfig() {
-    this.config = vscode.workspace.getConfiguration("twinny")
+    this.config = vscode.workspace.getConfiguration("compny")
   }
 }

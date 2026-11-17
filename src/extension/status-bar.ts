@@ -41,7 +41,7 @@ export class TwinnyStatusBar {
   public refresh() {
     if (this._generations.state.busy) return
 
-    const config = workspace.getConfiguration("twinny")
+    const config = workspace.getConfiguration("compny")
     if (!config.get<boolean>("enabled", true)) {
       this._item.hide()
       return

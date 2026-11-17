@@ -178,7 +178,7 @@ const secretShieldMode = (): SecretShieldMode => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const vscode = require("vscode") as typeof import("vscode")
     return vscode.workspace
-      .getConfiguration("twinny")
+      .getConfiguration("compny")
       .get<SecretShieldMode>("secretShield", "offMachine")
   } catch {
     return "offMachine"

@@ -2,7 +2,7 @@ export const ACTIVE_CONVERSATION_STORAGE_KEY = "twinny.active-conversation"
 export const ACTIVE_CHAT_PROVIDER_STORAGE_KEY = "twinny.active-chat-provider"
 export const ACTIVE_EMBEDDINGS_PROVIDER_STORAGE_KEY =
   "twinny.active-embeddings-provider"
-export const ACTIVE_FIM_PROVIDER_STORAGE_KEY = "twinny.active-fim-provider"
+export const ACTIVE_FIM_PROVIDER_STORAGE_KEY = "compny.active-fim-provider"
 export const CONVERSATION_STORAGE_KEY = "twinny.conversations"
 export const INFERENCE_PROVIDERS_STORAGE_KEY = "twinny.inference-providers"
 /** Paired P2P devices, keyed by their public key. */

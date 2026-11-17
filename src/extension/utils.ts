@@ -285,7 +285,7 @@ export async function getAllFilePaths(dirPath: string): Promise<string[]> {
   if (!dirPath) return []
 
   const rootPath = workspace.workspaceFolders?.[0]?.uri.fsPath || ""
-  const config = workspace.getConfiguration("twinny")
+  const config = workspace.getConfiguration("compny")
   const submodules = readGitSubmodulesFile()
 
   const ig = ignore()

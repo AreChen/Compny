@@ -153,7 +153,7 @@ function notifyCompletionFailure(error: unknown) {
         ? "Compny 补全请求受到限流或额度限制，请检查接口额度。"
         : `Compny 补全请求失败${failure.status ? `（HTTP ${failure.status}）` : ""}。请查看日志。`
   void window.showErrorMessage(message, "打开配置", "查看日志").then(choice => {
-    if (choice === "打开配置") void commands.executeCommand("twinny.configureOpenAI")
+    if (choice === "打开配置") void commands.executeCommand("compny.configureOpenAI")
     else if (choice === "查看日志") logger.show()
   })
 }

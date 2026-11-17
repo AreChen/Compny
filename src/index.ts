@@ -4,6 +4,7 @@ import { TWINNY_COMMAND_NAME } from "./common/constants"
 import { logger } from "./common/logger"
 import { getLineBreakCount } from "./common/text"
 import { FileInteractionCache } from "./extension/completion/file-interaction"
+import { migrateLegacySettings } from "./extension/completion/migrate"
 import { CompletionProvider } from "./extension/completion/provider"
 import { CompletionSettingsView } from "./extension/completion/settings-view"
 import { GenerationTracker } from "./extension/generations"
@@ -12,31 +13,32 @@ import { TwinnyStatusBar } from "./extension/status-bar"
 import { TemplateProvider } from "./extension/templates/provider"
 import { delayExecution } from "./extension/utils"
 
-const SECRET_KEY = "twinny.openai.apiKey"
+const SECRET_KEY = "compny.openai.apiKey"
 
 export async function activate(context: ExtensionContext) {
+  await migrateLegacySettings(context)
   setOpenAIKey(await context.secrets.get(SECRET_KEY) || "")
   const generations = new GenerationTracker()
   const cache = new FileInteractionCache()
   const completion = new CompletionProvider(generations, cache, new TemplateProvider(undefined), context)
   const status = new TwinnyStatusBar(window.createStatusBarItem(StatusBarAlignment.Right), context, generations)
   const settingsView = new CompletionSettingsView(context, () => status.refresh())
-  const configure = async () => { await commands.executeCommand("twinny.sidebar.focus") }
+  const configure = async () => { await commands.executeCommand("compny.sidebar.focus") }
   context.subscriptions.push(
     cache, completion, status,
-    window.registerWebviewViewProvider("twinny.sidebar", settingsView),
+    window.registerWebviewViewProvider("compny.sidebar", settingsView),
     generations.onDidChange(({ stoppable }) => {
-      void commands.executeCommand("setContext", "twinnyGeneratingText", stoppable)
+      void commands.executeCommand("setContext", "compnyGeneratingText", stoppable)
     }),
     languages.registerInlineCompletionItemProvider({ pattern: "**" }, completion),
-    commands.registerCommand("twinny.configureOpenAI", configure),
-    commands.registerCommand(TWINNY_COMMAND_NAME.enable, () => workspace.getConfiguration("twinny").update("enabled", true, ConfigurationTarget.Global)),
-    commands.registerCommand(TWINNY_COMMAND_NAME.disable, () => workspace.getConfiguration("twinny").update("enabled", false, ConfigurationTarget.Global)),
+    commands.registerCommand("compny.configureOpenAI", configure),
+    commands.registerCommand(TWINNY_COMMAND_NAME.enable, () => workspace.getConfiguration("compny").update("enabled", true, ConfigurationTarget.Global)),
+    commands.registerCommand(TWINNY_COMMAND_NAME.disable, () => workspace.getConfiguration("compny").update("enabled", false, ConfigurationTarget.Global)),
     commands.registerCommand(TWINNY_COMMAND_NAME.stopGeneration, () => generations.stopAll()),
     commands.registerCommand(TWINNY_COMMAND_NAME.showLogs, () => logger.show()),
-    commands.registerCommand(TWINNY_COMMAND_NAME.settings, () => commands.executeCommand("workbench.action.openSettings", "twinny")),
+    commands.registerCommand(TWINNY_COMMAND_NAME.settings, () => commands.executeCommand("workbench.action.openSettings", "compny")),
     commands.registerCommand(TWINNY_COMMAND_NAME.statusBarMenu, async () => {
-      const config = workspace.getConfiguration("twinny")
+      const config = workspace.getConfiguration("compny")
       const enabled = config.get<boolean>("autoSuggestEnabled", true)
       const choice = await window.showQuickPick([
         { label: enabled ? "Pause auto-suggest" : "Resume auto-suggest", action: "toggle" },
@@ -60,9 +62,9 @@ export async function activate(context: ExtensionContext) {
       completion.selectionChanged(event)
       delayExecution(() => completion.setAcceptedLastCompletion(false), 200)
     }),
-    workspace.onDidChangeConfiguration(event => { if (event.affectsConfiguration("twinny")) { status.refresh(); void settingsView.refresh() } })
+    workspace.onDidChangeConfiguration(event => { if (event.affectsConfiguration("compny")) { status.refresh(); void settingsView.refresh() } })
   )
   status.refresh()
 }
 
-export function deactivate() { logger.info("Twinny deactivated") }
+export function deactivate() { logger.info("Compny deactivated") }

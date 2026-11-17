@@ -104,7 +104,7 @@ export class Logger {
   private get enabled() {
     if (!vscode) return false
     return vscode.workspace
-      .getConfiguration("twinny")
+      .getConfiguration("compny")
       .get<boolean>("enableLogging", true)
   }
 
